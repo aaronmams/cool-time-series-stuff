@@ -72,28 +72,62 @@ require(tseries)
 #2.  generate some new data to play with
 
 #generate 2 really simple monthly process
-seasonal.data <- function(sigma1,sigma2,nmonth1){
+seasonal.data <- function(mu,sigma1,annual.total=12000,
+                          shares.before=c(0.02,0.03,0.04,0.05,0.05,0.06,0.15,0.2,0.20,0.1,0.05,0.05),
+                          shares.after=c(0.01,0.01,0.02,0.02,0.02,0.05,0.1,0.2,0.30,0.2,0.05,0.02),
+                          sigma2=100){
+
+#inputs
+  # mu    the annual mean of the first series...the first series is generated according to a 
+  #       process that spreads the annual total evenly among all the months before the break, then
+  #       after the break spreads 25% of the annual total evenly among 9 months and spreads 75% of
+  #       the annual total among the 3 summer months.  Note that this series is assumed stationary
+  #       in the sense that the annual total doesn't change after the break.  So once the parameter mu
+  #       is set, the monthly mean values for every month in the series can be recovered.
+  
+  # sigma1   a 3X1 vector of variance parameters.  
+  #           sigma1[1]: noise around the monthly mean values in the first part of the first series.
+  #           sigma[2]: noise around the monthly mean values after the break for the 9 months where
+  #                     where 25% of the annual total is evenly distributed among 9 months.
+  #           sigma[3]: noise around the monthly mean values after the break for the 3 months where 75% 
+  #                     of the annual total is evenly distributed over 3 months.
+  
+  # annual.total  the annual total for the 2nd series that will be apportioned among the months
+  
+  # shares.before   a 1X12 vector defining the seasonality of the 2nd series in the period before the break.
+  #                   values correspond to the % of the annual total in each month
+  
+  # shares.after    a 1X12 vector defining the seasonality of the 2nd series in the period after the break.
+  #                   values correspond to the % of the annual total in each month
+  
+  # sigma2          a numeric constant defining the noise around the monthly means for the 2nd series.  In
+  #                   generating the 2nd series the variance for each monthly observation is taken to be a 
+  #                   constant fraction of the mean.  The value sigma2 defines this fraction.  Larger values will 
+  #                   produce less noise in the series and smaller values will produce series with more noise.
+  
   #6 years worth of approximately evenly distributed landings
   year <- c(rep(2005,12),rep(2006,12),rep(2007,12),rep(2008,12),rep(2009,12),rep(2010,12))
   month <- c(rep(1:12,6))
-  y <- rnorm(nmonth1,1000,10)
-  df <- data.frame(year=year,month=month,lbs=y)
-  
+  y <- rnorm(nmonth1,mu/12,sigma1[1])
+  df <- data.frame(year=year,month=month,lbs=y) 
+
+mu2 <- mu*0.25
+mu3 <- mu*0.75
   #4 years worth of landings that are evenly distributed throughout 9 months and
   # spike up considerably in the months June-August
   year2 <- c(rep(2011,12),rep(2012,12),rep(2013,12),rep(2014,12))
   month2 <- c(rep(1:12,4))
   
   #9 month X 4 years of data distributed N(333.333,0.666)
-  month1 <- data.frame(lbs=c(rnorm(36,333.333,1.2)),month=rep(c(1,2,3,4,5,9,10,11,12),4),
+  month1 <- data.frame(lbs=c(rnorm(36,mu2/9,sigma1[2])),month=rep(c(1,2,3,4,5,9,10,11,12),4),
                        year=c(rep(2011,9),rep(2012,9),rep(2013,9),rep(2014,9)))
   #3 months X 4 years of data distributed N(3000,6)
-  month2 <- data.frame(lbs=c(rnorm(12,3000,12)),month=rep(c(6,7,8),4),
+  month2 <- data.frame(lbs=c(rnorm(12,mu3/3,sigma1[3])),month=rep(c(6,7,8),4),
                        year=c(rep(2011,3),rep(2012,3),rep(2013,3),rep(2014,3)))
   
   df2 <- data.frame(rbind(month1,month2))
   
-  z <- tbl_df(rbind(df,df2))
+  z <- tbl_df(rbind(df,df2)) 
   #====================================================================================
   #====================================================================================
   #====================================================================================
@@ -107,8 +141,9 @@ seasonal.data <- function(sigma1,sigma2,nmonth1){
   
   y <- data.frame(year=year,month=month)
   
-  total.lbs <- 12000
-  mean.shares <- c(0.02,0.03,0.04,0.05,0.05,0.06,0.15,0.2,0.20,0.1,0.05,0.05)
+  total.lbs <- annual.total
+  #mean.shares <- c(0.02,0.03,0.04,0.05,0.05,0.06,0.15,0.2,0.20,0.1,0.05,0.05)
+  mean.shares <- shares.before
   mean.lbs <- mean.shares*total.lbs
   
   df <- rbind(data.frame(year=c(2005:2010),month=1,lbs=rnorm(6,mean.lbs[1],mean.lbs[1]/sigma2)),
@@ -129,8 +164,10 @@ seasonal.data <- function(sigma1,sigma2,nmonth1){
   
   
   #Now change the process abruptly
-  mean.shares2 <- c(0.01,0.01,0.02,0.02,0.02,0.05,0.1,0.2,0.30,0.2,0.05,0.02)
-  mean.lbs2 <- mean.shares2*total.lbs
+  #mean.shares2 <- c(0.01,0.01,0.02,0.02,0.02,0.05,0.1,0.2,0.30,0.2,0.05,0.02)
+  mean.shares2 <- shares.after
+  mean.lbs2 <- mean.shares2*annual.total
+  
   df <- rbind(data.frame(year=c(2011:2014),month=1,lbs=rnorm(4,mean.lbs2[1],mean.lbs2[1]/sigma2)),
               data.frame(year=c(2011:2014),month=2,lbs=rnorm(4,mean.lbs2[2],mean.lbs2[2]/sigma2)),
               data.frame(year=c(2011:2014),month=3,lbs=rnorm(4,mean.lbs2[3],mean.lbs2[3]/sigma2)),
