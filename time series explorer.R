@@ -75,7 +75,7 @@ require(tseries)
 seasonal.data <- function(mu,sigma1,annual.total=12000,
                           shares.before=c(0.02,0.03,0.04,0.05,0.05,0.06,0.15,0.2,0.20,0.1,0.05,0.05),
                           shares.after=c(0.01,0.01,0.02,0.02,0.02,0.05,0.1,0.2,0.30,0.2,0.05,0.02),
-                          sigma2=100){
+                          sigma2=75){
 
 #inputs
   # mu    the annual mean of the first series...the first series is generated according to a 
