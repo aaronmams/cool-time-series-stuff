@@ -6,7 +6,7 @@
 #Necessary updates include:
 
 #1. expirimenting with the different structural break and regime switching models for
-#    seasonal time-series data
+#    seasonal time-series data: MSwM, bfast, strucchange packages, etc.s
 
 #2.  improving the data generation function to be a bit more general.
 
