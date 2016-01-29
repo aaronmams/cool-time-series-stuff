@@ -273,7 +273,7 @@ z <- seasonal.data(mu=12000,sigma1=c(10,10,30))
 
 
 #UNCOMMENT NEXT LINE TO WORK WITH THE SAME DATA SET I USE IN THE BLOG POST
-#z <- readRDS(file="test_data.RDA")
+z <- readRDS(file="test_data.RDA")
 
 #plot the two series
 ggplot(z,aes(x=date,y=lbs)) + geom_line()  + facet_wrap(~series) + 
@@ -516,12 +516,12 @@ plot.tmp <- meanstest[54,]
 
 s1$t <- seq(1:nrow(s1))
 
-#this is pretty contrived but since I know the 48th element of the
+#this is pretty contrived but since I know the 54th element of the
 # "meanstest" object test for a significant difference between the
 # mean of the series calculated from 2011/06/01-2011/08/01 and 
 # from 2008/01/01-2014/01/01, I'm just going to pull that element out
 # and illustrate the different means.
-ggplot(subset(s1,year>2007),aes(x=as.numeric(t),y=lbs)) + geom_line() +
+ggplot(s1,aes(x=as.numeric(t),y=lbs)) + geom_line() +
   xlab("t") + ylab("fake data") + 
   geom_segment(aes(x = 78, y = 2000, xend = 81, yend = 2000,
                    colour = "segment"),data = plot.tmp,
