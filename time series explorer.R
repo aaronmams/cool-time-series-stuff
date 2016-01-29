@@ -108,7 +108,7 @@ seasonal.data <- function(mu,sigma1,annual.total=12000,
   #6 years worth of approximately evenly distributed landings
   year <- c(rep(2005,12),rep(2006,12),rep(2007,12),rep(2008,12),rep(2009,12),rep(2010,12))
   month <- c(rep(1:12,6))
-  y <- rnorm(nmonth1,mu/12,sigma1[1])
+  y <- rnorm(72,mu/12,sigma1[1])
   df <- data.frame(year=year,month=month,lbs=y) 
 
 mu2 <- mu*0.25
@@ -266,14 +266,14 @@ mu3 <- mu*0.75
 #here you can choose to run the simulation function above to generate a new 
 # set of data...or you can read from a saved data frame to work with the same
 # data I used in the blog post
-#z <- seasonal.data(nmonth1=72)
+z <- seasonal.data(mu=12000,sigma1=c(10,10,30))
 
 #save the data for replication
 #saveRDS(z,file="test_data.RDA")
 
 
-#read the test data
-z <- readRDS(file="test_data.RDA")
+#UNCOMMENT NEXT LINE TO WORK WITH THE SAME DATA SET I USE IN THE BLOG POST
+#z <- readRDS(file="test_data.RDA")
 
 #plot the two series
 ggplot(z,aes(x=date,y=lbs)) + geom_line()  + facet_wrap(~series) + 
