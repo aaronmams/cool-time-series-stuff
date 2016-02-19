@@ -50,6 +50,7 @@ require(strucchange)
 require(lmtest)
 require(lawstat)
 require(tseries)
+require(matrixcalc)
 #################################################################################
 #################################################################################
 #################################################################################
@@ -716,60 +717,6 @@ lawstat::runs.test(s2$resid,plot.it=TRUE)
 #####################################################################################
 #####################################################################################
 #####################################################################################
-#Now for some econometrics
-
-
-
-#==================================================================================
-#==================================================================================
-#==================================================================================
-#As a first pass let's see if the Markov Regime Switching Model in the 
-# MSwM package can identify the break in our seasonal data?
-
-#MRSS with no autoregressive term---------------------------------
-mod1 <- lm(lbs~feb+mar+apr+may+jun+jul+aug+sep+oct+nov+dec,data=z[which(z$series==1),])
-mod1.mswm <- msmFit(mod1,k=2,p=0,sw=rep(TRUE,13),control=list(parallel=F))
-summary(mod1.mswm)
-dev.off()
-plotProb(mod1.mswm,which=2)
-#-------------------------------------------------------------------
-
-#MRSS with AR(1) term---------------------------------
-mod2 <- lm(lbs~feb+mar+apr+may+jun+jul+aug+sep+oct+nov+dec,data=z[which(z$series==1),])
-mod2.mswm <- msmFit(mod2,k=2,p=1,sw=rep(TRUE,14),control=list(parallel=F))
-summary(mod2.mswm)
-dev.off()
-plotProb(mod2.mswm,which=2)
-#-------------------------------------------------------------------
-
-#----------------------------------------------------------------
-#MRSS model estimated in first differences
-mod.dff <- lm(diff~feb+mar+apr+may+jun+jul+aug+sep+oct+nov+dec,data=z[which(z$series==1),])
-moddiff.mswm <- msmFit(mod.dff,k=2,p=1,sw=rep(TRUE,14),control=list(parallel=F))
-summary(moddiff.mswm)
-dev.off()
-plotProb(moddiff.mswm,which=2)
-
-#----------------------------------------------------------------
-
-
-#MRSS with just an intercept and AR(1) term--------------------
-
-mod3 <- lm(lbs~1,data=z)
-mod3.mswm <- msmFit(mod3,k=2,p=1,sw=rep(TRUE,3),control=list(parallel=F))
-dev.off()
-plotProb(mod3.mswm,which=2)
-summary(mod3.mswm)
-#--------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
 
 
 

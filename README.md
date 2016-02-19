@@ -46,3 +46,8 @@ The function **seasonal.data()** accepts the following inputs:
 * shares.before - this is a 1X12 vector that determines the monthly shares of the total in the first 6 years of the series.  Example: shares.before=c(0.01,0.01,0.05,0.05,0.01,0.01,0.2,0.2,0.1,0.1,0.2,0.06) says that on average january gets 10% of *annual.total*, february gets 10%, march gets 5%, april gets 5%,....., and december gets 6% of *annual.total*.
 * shares.after - this is a 1X12 vector that determines the monthly shares of the total in the last 4 years of the series.
 * sigma2 - a numeric constant.  This is a number that determines the noise around the monthly means for the second series.  In the second series the variance for the monthly distributions is proportional to the mean.  The constant sigma2 defines what proportion of the mean the variance will be.  Larger values will produce less noise around the monthly mean values and smaller values will produce more noise.
+
+##Estimations
+
+The script **time series models.R** has code do a few different maximum likelihood-type estimation of Markov Regime Switching
+Models.  I'm working on beefing this up but right now it just has a simple Hamilton Filter for a 2-state model of natural gas prices and oil prices that I wrote...plus a few snippets of code that will give you the flavor of how to use the **MSWM Package** to estimate a Markov Regime Switching Model.
