@@ -306,7 +306,8 @@ mswm.smooth$t <- seq(1:nrow(mswm.smooth))
 mswm.smooth$model <- 'MSwM'
 
 tmp <- rbind(tmp,mswm.smooth)
-  ggplot(tmp,aes(x=t,y=s2,color=model)) + geom_line() 
+  ggplot(tmp,aes(x=t,y=s2,color=model)) + geom_line(size=1) + 
+  ylab("Smoothed Probability of Regime 2") + theme_bw()
 #---------------------------------------------------------------------
 ###########################################################################################
 ###########################################################################################
@@ -318,7 +319,26 @@ tmp <- rbind(tmp,mswm.smooth)
 #Now let's reproduce the plots that the MSwM package makes by adding 'recession bars' to
 # indicate which regime my Hamilton Filter/Hamilton Smoother says we are in...
 
+theta.start <- c(0.1,-0.01,0.4,0.3,0.1,0.2,0.5,0.5)
+opt.mams <- optim(theta.start,mrs.est,x=lnoil,y=lnng,hessian=T,control=list(maxit=20000))
 
+theta.smooth <- c(opt.mams$par[1:6],1/(1+exp(-opt.mams$par[7])),1/(1+exp(-opt.mams$par[8])))
+
+tmp <- tbl_df(data.frame(ham.smooth(theta=theta.smooth,y=lnng,x=lnoil))) %>%
+        mutate(regime=ifelse(s1>0.5,1,2),switch=ifelse(regime!=lag(regime),1,0))
+tmp$date <- lng$date 
+
+switching <- tmp %>% filter(switch==1) %>% 
+  mutate(startdate=date,enddate=lead(date)) %>% 
+  filter(regime==2) 
+#fix the last date in series
+switching$enddate[which(is.na(switching$enddate))] <- as.Date('2016-01-01')
+switching <- data.frame(switching)
+
+ggplot(lng,aes(date,lng)) + geom_line()  +
+   geom_rect(data=switching, aes(x=NULL,y=NULL,xmin=startdate,xmax=enddate,
+                   ymin=ymin,ymax=ymax),fill="red",alpha=0.2) + guides(fill=FALSE) + 
+    ggtitle("Smoothed Probability of Being in Regime 2") + theme_bw()
 
 ###########################################################################################
 ###########################################################################################
