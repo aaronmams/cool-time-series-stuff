@@ -461,6 +461,30 @@ plotProb(mod2.mswm,which=2)
 ###################################################################################
 ###################################################################################
 
+#Now we are going to use the strucchange package to locate and date our structural
+# breaks
+
+require(strucchange)
+
+#first we are going to use the supF test to determine whether the parameters of our
+# monthly dummy variable regression are stable through the time series:
+
+
+fs.days <- Fstats(days~feb+mar+apr+may+june+july+aug+sept+oct+nov+dec,data=z)
+plot(fs.days)
+
+#use the breakpoints functions to find BIC corresponding to optimal number of breaks
+bp.days <- breakpoints(days~feb+mar+apr+may+june+july+aug+sept+oct+nov+dec,data=z)
+
+#plot BIC and # of breakpoints
+bp.plot <- data.frame(t(matrix(summary(bp.days)$RSS,nr=2)))
+bp.plot$breaks <- seq(0:(nrow(bp.plot)-1))
+
+ggplot(bp.plot,aes(x=breaks,y=X2)) + geom_line() + geom_point() + theme_bw() + 
+  ylab("BIC")
+
+
+
 
 
 
